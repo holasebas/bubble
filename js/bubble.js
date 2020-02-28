@@ -11,7 +11,7 @@ function Bubble(style, type, x, y, w, state = 1) {
     this.delete = (x, y) => {
 
         $(this.me()).remove();
-        matrix[y][x] = undefined;
+        gameManager.game.bubble_matrix[y][x] = undefined;
 
     }
 

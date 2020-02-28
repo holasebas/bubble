@@ -1,4 +1,4 @@
-function gridManager(matrixLength){
+function gridManager(matrixLength, bubble_types){
 
     this.matrixLength = matrixLength
     this.bubble_dimention;  
@@ -7,6 +7,7 @@ function gridManager(matrixLength){
     this.grid_spacing;
     this.gird_width;
     this.bubble_radius;
+
 
 
     this.init = () =>{
@@ -18,10 +19,9 @@ function gridManager(matrixLength){
             this.gird_width = this.bubble_width * this.matrixLength
             this.bubble_radius = this.bubble_width / 2;
 
-            this.creatematrix(this.matrixLength);
             this.setRaycast();
-
-            //set_raycast();
+            return this.creatematrix(this.matrixLength);
+            
     }
 
     this.creatematrix = (length) => {
@@ -54,9 +54,9 @@ function gridManager(matrixLength){
     
             }
         }
+        return matrix;
 
     }
-
     this.setRaycast = () =>{
         $("#raycast").css({
             "width": this.bubble_width + "px",
@@ -66,7 +66,36 @@ function gridManager(matrixLength){
             "width": this.bubble_width + "px",
             "height": this.bubble_width + "px"
         });
-        $("#target").append('<div id="bubble_ready" class="bubble infinite_anim" style="width:' + this.bubble_width + 'px; height:' + this.bubble_width + 'px" data-type="' + this.bubble_type + '"></div>');
+    }
+    this.closer_space = () => {
+        var menor = 2048;
+        var bubble_space;
+        $(".grid_bubble[data-empty='1']").each(function (i, bubble_grid) {
+        
+            if (this.get_distance(gameManager.game.bubble.me('anchor'), $(bubble_grid)) < menor) {
+                menor = this.get_distance(gameManager.game.bubble.me('anchor'), $(bubble_grid))
+                bubble_space = $(bubble_grid);
+            }
+
+        }.bind(this))
+
+        var space_cords = {
+            x: bubble_space.attr('data-column'),
+            y: bubble_space.attr('data-row'),
+            top: bubble_space.offset().top,
+            left: bubble_space.offset().left
+        }
+        bubble_space.attr("data-empty", "0");
+        return space_cords;
+    }   
+    this.get_distance = (bubble, bubble_grid) => {
+        var dx = bubble.offset().left - bubble_grid.offset().left - this.bubble_radius;
+        var dy = bubble.offset().top - bubble_grid.offset().top - this.bubble_radius;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        return distance;
+    }
+    this.clearSpace = (x, y) => {
+        $(".grid_bubble[data-column='" + x + "'][data-row='" + y + "']").attr("data-empty", "1").css({ 'background-color': 'rgba(255,255,255,0.3)' })
     }
 
 }

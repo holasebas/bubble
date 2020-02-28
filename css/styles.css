@@ -24,7 +24,15 @@ html {
     /* Non-prefixed version, currently
                                 supported by Chrome, Opera and Firefox */
 }
-
+.text-bubble{
+    font-family: Bubble;
+}
+.absolute-center{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
 nav {
     height: 70px;
     background-image: url('../img/Ui/navbg.png');
@@ -48,7 +56,7 @@ nav {
 }
 
 .red {
-    border: 1px solid red;
+    /* border: 1px solid red; */
 }
 
 .check {
@@ -83,13 +91,29 @@ nav {
     background-position: center center;
     background-repeat: no-repeat;
 }
-/* .scene_instructions{
+.scene_instructions{
     position: absolute;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.7);
     z-index: 1001;
-} */
+}
+.instructionsbox_content{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -48%);
+    height: 52%;
+}
+.instructionsbox_text{
+    font-family: bubble;
+    font-size: 36px;
+    text-align: center;
+    color: #fe9a00;
+}
+.instructionsbox{
+    width: 90%;
+}
+
 .cta{
     display: flex;
     justify-content: center;
@@ -98,10 +122,18 @@ nav {
     height: 70px; 
     cursor: pointer;
 }
+.cta--small{
+    width: 150px;
+    height: 50px;
+}
+
 .cta_text{
     font-size: 38px;
     font-family: 'Bubble';
     text-shadow: 1px 1px 5px  rgba(0, 0, 0, 0.2);
+}
+.cta--small .cta_text{
+    font-size: 26px;
 }
 
 .cta--yellow{

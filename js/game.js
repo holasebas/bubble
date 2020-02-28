@@ -6,33 +6,40 @@ function game(min, sec, counters = [], bubbletypes = []) {
     this.counters = counters;
     this.bubbleCounters = [];
     this.bubbleTypes = bubbletypes;
-    this.bubble_matrix = [];
-
-
-    this.gridManager = new gridManager(8)
     
+
+    this.gridManager = new gridManager(8);
+    this.bubble_matrix = [];
 
 
     this.flag = false;
     this.shoting = false;
     this.bubble;
-    this.bubble_type;
+    console.log(bubbletypes);
+    console.log(counters);
+
+    this.bubble_type = bubbletypes[randomInt(0,bubbletypes.length - 1)];
+
+
     this.bubble_speed = 20.0
     this.bl = 0;
     this.bt = 0;
     this.inclinacion = false;
 
-
-
-
-
-
     this.bubbleDistance
 
+    this.prom = [];
+    this.chainX = [];
+    this.chainY = [];
+    this.chain = 0;
+    this.toBreak = [];
 
     this.init = () => {
-        this.gridManager.init();
-        
+        this.bubble_matrix = this.gridManager.init();
+        this.bubble_width = this.gridManager.bubble_width;
+        $("#target").append('<div id="bubble_ready" class="bubble infinite_anim" style="width:' + this.bubble_width + 'px; height:' + this.bubble_width + 'px" data-type="' + this.bubble_type + '"></div>');
+
+
         this.counters.forEach((type, i) => {
             var counter = new bubbleCounter(type, 0);
             counter.render();
@@ -41,10 +48,8 @@ function game(min, sec, counters = [], bubbletypes = []) {
         });
         this.setTimer();
         this.start();
-        
-        //window.requestAnimationFrame(this.loop);
-    }
 
+    }
     this.start = () => {
         window.requestAnimationFrame(this.loop);
         return new Promise((resolve) => {
@@ -75,35 +80,34 @@ function game(min, sec, counters = [], bubbletypes = []) {
         })
 
     }
-
     this.loop = (timestamp) => {
  
         if (this.flag) {
 
-            // if (_bubbleCollisionLeftWall()) {
-            //     if (vector().x < 0) {
-            //         inclinacion = true;
-            //     } else {
-            //         inclinacion = false;
-            //     }
+            if (this._bubbleCollisionLeftWall()) {
+                if (vector(this.bubble_speed).x < 0) {
+                    this.inclinacion = true;
+                } else {
+                    this.inclinacion = false;
+                }
 
-            // }
-            // if (_bubbleCollisionRightWall()) {
-            //     if (vector().x > 0) {
-            //         inclinacion = true;
-            //     } else {
-            //         inclinacion = false;
-            //     }
+            }
+            if (this._bubbleCollisionRightWall()) {
+                if (vector(this.bubble_speed).x > 0) {
+                    this.inclinacion = true;
+                } else {
+                    this.inclinacion = false;
+                }
 
-            // }
+            }
 
-            // if (_bubbleCollision()) {
-            //     stopBubble();
-            // } else {
+            if (this._bubbleCollision()) {
+                 this.stopBubble();
+            } else {
 
                 this.bubble.translate(this.bl, this.bt);
 
-            // }
+            }
 
             if (this.flag) {
                 if (this._bubbleCollisionTopWall()) {
@@ -112,7 +116,6 @@ function game(min, sec, counters = [], bubbletypes = []) {
 
                 }
             }
-
 
             if (this.flag) {
                 if (!this.inclinacion) {
@@ -129,7 +132,6 @@ function game(min, sec, counters = [], bubbletypes = []) {
         }
         window.requestAnimationFrame(this.loop)
     }
-
     this.shoot = () => {
         if (!this.flag && !this.shoting) {
             var targ = document.querySelector("#target").getClientRects();
@@ -137,69 +139,248 @@ function game(min, sec, counters = [], bubbletypes = []) {
             var left = targ[0].left;
             $("#bubble_ready").removeClass("infinite_anim");
             $("#bubble_ready").remove();
-            this.bubble = new Bubble('pink_lined', 1, left, top, 50);
+            this.bubble = new Bubble('pink_lined', this.bubble_type, left, top, this.bubble_width);
             $("main").append(this.bubble.render());
             this.flag = true;
             this.shoting = true;
         }
     }
-
     this.stopBubble = () => {
-        // bubble_type = randomInt(1, 2);
+        this.bubble_type = bubbletypes[randomInt(0,bubbletypes.length - 1)];
         this.flag = false;
+     
         // bubblePlay();
      
         //     randColor2 = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
-        //     var space_cords = closer_space();
-        //     matrix[space_cords.y][space_cords.x] = bubble;
+                var space_cords = this.gridManager.closer_space();
+                this.bubble_matrix[space_cords.y][space_cords.x] = this.bubble;
         
         
-        //     prom.push(bubbleBreak_async(space_cords.x, space_cords.y));
+            prom.push(this.bubbleBreak_async(space_cords.x, space_cords.y));
         
         
-        //     Promise.all(prom).then((res) => {
+            Promise.all(prom).then(function(res){
         
-        //         if (chain < 3) {
-        //             bubbleBreak(space_cords.x, space_cords.y).then(function(){
-        //                 shoting = false;
-        //                 // $("#raycast").removeClass("hide"); 
-        //             });
-        //         } else {
-        //             toBreak.push({ x: space_cords.x, y: space_cords.y });
-        //             getBubbles(toBreak);
-        //         }    
-        //         chain = 0;
-        //         toBreak = [];
-        //         prom = [];
-        //         chainX = [];
-        //         chainY = [];
+                if (this.chain < 3) {
+                    this.bubbleBreak(space_cords.x, space_cords.y).then(function(){
+                        this.shoting = false;
+                        // $("#raycast").removeClass("hide"); 
+                    }.bind(this));
+                } else {
+                    this.toBreak.push({ x: space_cords.x, y: space_cords.y });
+                    this.getBubbles(this.toBreak);
+                }    
+                this.chain = 0;
+                this.toBreak = [];
+                this.prom = [];
+                this.chainX = [];
+                this.chainY = [];
                 
         
-        //     });
+            }.bind(this));
+
+
+            // this.bubbleBreak(space_cords.x, space_cords.y).then(function(){
+            //     this.shoting = false;
+            // }.bind(this));
     
-        //     bubble.adjust(space_cords.left, space_cords.top).then(() => {
-        //         bubble.setState(0);
-        //         bt = 0;
-        //         bl = 0;
-        //         inclinacion = false;
-        //         bubble = undefined;
-        //         rotates(0)
-                
-        //     });
+            this.bubble.adjust(space_cords.left, space_cords.top).then(() => {
+                this.bubble.setState(0);
+                this.bt = 0;
+                this.bl = 0;
+                this.inclinacion = false;
+                this.bubble = undefined;
+                this.rotates(0)
+            });
     
-        //     var bubble_ready = new Promise((resolve)=>{
-        //         $("#target").append('<div id="bubble_ready" class="bubble infinite_anim" style="width:' + bubble_width + 'px; height:' + bubble_width + 'px" data-type="' + bubble_type + '"></div>');
-        //         resolve();
-        //     }) 
-        //     bubble_ready.then(()=>{
-        //         TweenMax.fromTo($("#bubble_ready"), 0.3, {scale:0},{scale:1,ease: Power1.easeIn})
-        //     })
+            var bubble_ready = new Promise((resolve)=>{
+                $("#target").append('<div id="bubble_ready" class="bubble infinite_anim" style="width:' + this.bubble_width + 'px; height:' + this.bubble_width + 'px" data-type="' + this.bubble_type + '"></div>');
+                resolve();
+            }) 
+            bubble_ready.then(()=>{
+                TweenMax.fromTo($("#bubble_ready"), 0.3, {scale:0},{scale:1,ease: Power1.easeIn})
+            })
     
         
     
     }
+    this.bubbleBreak = (x, y) => {
 
-
+        return new Promise((resolve, reject) => {
+            var randColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+            // var randColor = 'rgba(255,255,255,0.3);';
+    
+            var mx;
+            var my;
+    
+            if (y % 2 == 0) {
+                my = -1
+                mx = -1
+                for (let i = 1; i <= 6; i++) {
+                    if (i == 6) {
+                        mx = -1;
+                    }
+                    if (mx == 2) {
+                        mx = -1;
+                    }
+    
+                    //$(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor });
+                    this.collideAnimation((parseInt(x) + mx), (parseInt(y) + my));
+                    if (Number.isInteger(i / 2)) {
+                        my = my + 1;
+                    }
+                    mx = mx + 1;
+                }
+            } else {
+                my = -1;
+                mx = 0;
+                for (let i = 1; i <= 6; i++) {
+                    if (i == 1 || i == 6) {
+                        mx = 0;
+                    }
+                    if (i == 3) {
+                        mx = -1;
+                    }
+                    if (i == 2 || i == 4 || i == 5) {
+                        mx = +1;
+                    }
+    
+                    //$(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor });
+                    this.collideAnimation((parseInt(x) + mx), (parseInt(y) + my));
+                    if (Number.isInteger(i / 2)) {
+                        my = my + 1;
+                    }
+    
+                }
+            }
+            setTimeout(function(){
+                resolve();
+            },150)
+    
+            
+    
+    
+        })
+    }
+    this.bubbleBreak_async = (x, y) => {
+        this.chainX.push(parseInt(x));
+        this.chainY.push(parseInt(y));
+        return new Promise((resolve, reject) => {
+            var bubbleNext = [];
+    
+            var mx;
+            var my;
+    
+    
+            if (y % 2 == 0) {
+    
+                my = -1
+                mx = -1
+                for (let i = 1; i <= 6; i++) {
+    
+                    if (i == 6) {
+                        mx = -1;
+                    }
+                    if (mx == 2) {
+                        mx = -1;
+                    }
+    
+                    var type = this.matrixPath((parseInt(x) + mx), (parseInt(y) + my))
+                    if (type === this.bubble.type) {
+    
+                        // $(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor2 });
+    
+                        if (!this.chainExists((parseInt(x) + mx), (parseInt(y) + my))) {
+                            this.chain++;
+                            this.toBreak.push({ x: parseInt(x) + mx, y: parseInt(y) + my })
+                            this.prom.push(this.bubbleBreak_async((parseInt(x) + mx), (parseInt(y) + my)))
+    
+                        }
+                    }
+    
+                    this.chainX.push(parseInt(x) + mx);
+                    this.chainY.push(parseInt(y) + my);
+    
+    
+                    if (Number.isInteger(i / 2)) {
+                        my = my + 1;
+                    }
+                    mx = mx + 1;
+                }
+                resolve()
+    
+    
+            } else {
+    
+                my = -1;
+                mx = 0;
+                for (let i = 1; i <= 6; i++) {
+    
+                    if (i == 1 || i == 6) {
+                        mx = 0;
+                    }
+                    if (i == 3) {
+                        mx = -1;
+                    }
+                    if (i == 2 || i == 4 || i == 5) {
+                        mx = +1;
+                    }
+    
+                    var type = this.matrixPath((parseInt(x) + mx), (parseInt(y) + my))
+                    if (type === this.bubble.type) {
+                        // $(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor2 });
+    
+                        if (!this.chainExists((parseInt(x) + mx), (parseInt(y) + my))) {
+                            this.chain++;
+                            this.toBreak.push({ x: parseInt(x) + mx, y: parseInt(y) + my })
+                            this.prom.push(this.bubbleBreak_async((parseInt(x) + mx), (parseInt(y) + my)))
+    
+    
+    
+                        }
+                    }
+    
+                    this.chainX.push(parseInt(x) + mx);
+                    this.chainY.push(parseInt(y) + my);
+    
+    
+    
+                    if (Number.isInteger(i / 2)) {
+                        my = my + 1;
+                    }
+    
+                }
+    
+                resolve()
+    
+            }
+    
+        })
+    }
+    this.getBubbles = (bubbles) => {
+        var i = 0;
+        var delay = 100;
+    
+        bubbles.forEach(function(item){
+            
+            if (this.bubble_matrix[item.y][item.x] != undefined) {
+                setTimeout(() => {
+    
+                    this.bubble_matrix[item.y][item.x].bubbleGet(item.x, item.y);
+                    this.gridManager.clearSpace(item.x, item.y);
+                
+                }, i * delay);
+                i++;
+            }
+            
+        }.bind(this));
+        bubblePlayOut();
+        setTimeout(function(){
+            this.shoting = false;
+    
+        }.bind(this),i*delay)
+    
+    }
     this.rotates = (deg) => {
         if (!this.flag) {
             $("#_buchaca").css({
@@ -215,7 +396,6 @@ function game(min, sec, counters = [], bubbletypes = []) {
             });
         }
     }
-
     this.addBubble = (type) => {
         this.bubbleCounters.map(function (bubble) {
             if (bubble.type == type) {
@@ -238,7 +418,6 @@ function game(min, sec, counters = [], bubbletypes = []) {
     this.getbubbleTypes = () => {
         return bubbleTypes;
     }
-
     this.setTimer = () => {
         var min = this.min;
         var sec = this.sec;
@@ -251,7 +430,6 @@ function game(min, sec, counters = [], bubbletypes = []) {
         $("#timer .timer_min").text(min);
         $("#timer .timer_sec").text(sec);
     }
-
     this.minTxt = (min) => {
         if (min < 10) {
             return min = "0" + min;
@@ -266,14 +444,66 @@ function game(min, sec, counters = [], bubbletypes = []) {
         return sec;
     }
     this._bubbleCollisionTopWall = () => {
-
-
         var topWall = this.bubble.me().offset().top - $("#top_wall").offset().top;
         this.bubbleDistance = topWall;
         if (topWall <= 0) {
             return true;
+        }    
+    }
+    this._bubbleCollisionLeftWall = () => {
+
+        var leftWall = this.bubble.me().offset().left - $("#left_wall").offset().left
+        if (leftWall <= 0) {
+            return true;
         }
+    }
+    this._bubbleCollisionRightWall = () => {
     
+    
+        var rightWall = this.bubble.me().offset().left + this.bubble_width - $("#right_wall").offset().left
+        // console.log(rightWall)
+        if (rightWall >= 0) {
+            return true;
+        }
+    }
+    this._bubbleCollision = () => {
+
+        var collision = false;
+        $(".bubble[data-state='0'] .anchor").each(function (i, bubble) {
+           
+            if (calc(this.bubble.me('anchor'), $(bubble))) {
+                obs = $(this)
+                collision = true;
+                return false;
+            }
+        }.bind(this));
+
+        return collision;
+    }
+    this.collideAnimation = (x, y) => {
+        if (x >= 0 && y >= 0 && x <= this.bubble_matrix.length - 1 && y <= this.bubble_matrix.length - 1) {
+            if (this.bubble_matrix[y][x] != undefined) {
+                this.bubble_matrix[y][x].collisionAnimate()
+                return true;
+            }
+        }
+    }
+    this.chainExists = (x, y) => {
+        for (let i = 0; i < this.chainX.length; i++) {
+            if (this.chainX[i] === x && this.chainY[i] === y) {
+                return true;
+            }
+        }
+        return false;
+    }
+    this.matrixPath = (x, y) => {
+        if (x >= 0 && y >= 0 && x <= this.bubble_matrix.length - 1 && y <= this.bubble_matrix.length - 1) {
+            if (this.bubble_matrix[y][x] != undefined) {
+                //console.log(matrix[y][x].type)
+                return this.bubble_matrix[y][x].type;
+            }
+        }
+        return 0;
     
     }
 

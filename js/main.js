@@ -1,4 +1,4 @@
-var e = $('html');
+
 
 
 var bubble;
@@ -30,61 +30,61 @@ var randColor2;
 
 var prom = [];
 var bubbleNext = [];
+
 var chainX = [];
 var chainY = [];
-
 var chain = 0;
-var toBreak = []
+var toBreak = [];
 
 
-function creatematrix(length) {
-    matrix = [];
-    for (var i = 0; i < length; i++) {
-        matrix[i] = [];
-        var left = 0;
-        var top = 6;
-        if (i % 2 != 0) {
-            left = bubble_radius + grid_spacing / 2;
-        } else {
-            left = grid_spacing / 2;
-        }
-        $("#matrix").append('<div class="grid" data-row="' + i + '" style="height:' + bubble_width + 'px; top:-' + i * top + 'px; left:' + left + 'px;"></div>');
+// function creatematrix(length) {
+//     matrix = [];
+//     for (var i = 0; i < length; i++) {
+//         matrix[i] = [];
+//         var left = 0;
+//         var top = 6;
+//         if (i % 2 != 0) {
+//             left = bubble_radius + grid_spacing / 2;
+//         } else {
+//             left = grid_spacing / 2;
+//         }
+//         $("#matrix").append('<div class="grid" data-row="' + i + '" style="height:' + bubble_width + 'px; top:-' + i * top + 'px; left:' + left + 'px;"></div>');
 
-        for (var j = 0; j < length; j++) {
+//         for (var j = 0; j < length; j++) {
 
-            if (i % 2 != 0) {
-                if (j < matrixLength - 1) {
-                    $(".grid[data-row='" + i + "']").append('<div class="grid_bubble" style="width:' + bubble_width + 'px; height:' + bubble_width + 'px;" data-column="' + j + '" data-row="' + i + '" data-empty="1">' + j + ',' + i + '</div>');
-                    matrix[i][j] = undefined;
-                } else {
-                    matrix[i][j] = undefined;
-                }
-            } else {
-                $(".grid[data-row='" + i + "']").append('<div class="grid_bubble" style="width:' + bubble_width + 'px; height:' + bubble_width + 'px;" data-column="' + j + '" data-row="' + i + '" data-empty="1">' + j + ',' + i + '</div>');
-                matrix[i][j] = undefined;
-            }
+//             if (i % 2 != 0) {
+//                 if (j < matrixLength - 1) {
+//                     $(".grid[data-row='" + i + "']").append('<div class="grid_bubble" style="width:' + bubble_width + 'px; height:' + bubble_width + 'px;" data-column="' + j + '" data-row="' + i + '" data-empty="1">' + j + ',' + i + '</div>');
+//                     matrix[i][j] = undefined;
+//                 } else {
+//                     matrix[i][j] = undefined;
+//                 }
+//             } else {
+//                 $(".grid[data-row='" + i + "']").append('<div class="grid_bubble" style="width:' + bubble_width + 'px; height:' + bubble_width + 'px;" data-column="' + j + '" data-row="' + i + '" data-empty="1">' + j + ',' + i + '</div>');
+//                 matrix[i][j] = undefined;
+//             }
 
-        }
-    }
-}
-function closer_space() {
-    var menor = 2048;
-    var bubble_space;
-    $(".grid_bubble[data-empty='1']").each(function () {
-        if (get_distance(bubble.me('anchor'), $(this)) < menor) {
-            menor = get_distance(bubble.me('anchor'), $(this))
-            bubble_space = $(this);
-        }
-    })
-    var space_cords = {
-        x: bubble_space.attr('data-column'),
-        y: bubble_space.attr('data-row'),
-        top: bubble_space.offset().top,
-        left: bubble_space.offset().left
-    }
-    bubble_space.attr("data-empty", "0");
-    return space_cords;
-}
+//         }
+//     }
+// }
+// function closer_space() {
+//     var menor = 2048;
+//     var bubble_space;
+//     $(".grid_bubble[data-empty='1']").each(function () {
+//         if (get_distance(bubble.me('anchor'), $(this)) < menor) {
+//             menor = get_distance(bubble.me('anchor'), $(this))
+//             bubble_space = $(this);
+//         }
+//     })
+//     var space_cords = {
+//         x: bubble_space.attr('data-column'),
+//         y: bubble_space.attr('data-row'),
+//         top: bubble_space.offset().top,
+//         left: bubble_space.offset().left
+//     }
+//     bubble_space.attr("data-empty", "0");
+//     return space_cords;
+// }
 
 
 // function shoot() {
@@ -118,120 +118,121 @@ function closer_space() {
 //     }
 // }
 
-function get_distance(bubble, bubble_grid) {
-    var dx = bubble.offset().left - bubble_grid.offset().left - bubble_radius;
-    var dy = bubble.offset().top - bubble_grid.offset().top - bubble_radius;
-    var distance = Math.sqrt(dx * dx + dy * dy);
-    return distance;
-}
-function _bubbleCollision() {
+// function get_distance(bubble, bubble_grid) {
+//     var dx = bubble.offset().left - bubble_grid.offset().left - bubble_radius;
+//     var dy = bubble.offset().top - bubble_grid.offset().top - bubble_radius;
+//     var distance = Math.sqrt(dx * dx + dy * dy);
+//     return distance;
+// }
+// function _bubbleCollision() {
 
-    var collision = false;
-    $(".bubble[data-state='0'] .anchor").each(function (index) {
+//     var collision = false;
+//     $(".bubble[data-state='0'] .anchor").each(function (index) {
        
-        if (calc(bubble.me('anchor'), $(this))) {
-            obs = $(this)
-            collision = true;
-            return false;
-        }
-    });
-    return collision;
-}
-function _bubbleCollisionLeftWall() {
+//         if (calc(bubble.me('anchor'), $(this))) {
+//             obs = $(this)
+//             collision = true;
+//             return false;
+//         }
+//     });
+//     return collision;
+// }
 
-    var leftWall = bubble.me().offset().left - $("#left_wall").offset().left
-    if (leftWall <= 0) {
-        return true;
-    }
-}
-function _bubbleCollisionRightWall() {
+// function _bubbleCollisionLeftWall() {
 
-
-    var rightWall = bubble.me().offset().left + bubble_width - $("#right_wall").offset().left
-    // console.log(rightWall)
-    if (rightWall >= 0) {
-        return true;
-    }
-}
-function _bubbleCollisionTopWall() {
+//     var leftWall = bubble.me().offset().left - $("#left_wall").offset().left
+//     if (leftWall <= 0) {
+//         return true;
+//     }
+// }
+// function _bubbleCollisionRightWall() {
 
 
-    var topWall = bubble.me().offset().top - $("#top_wall").offset().top;
-    bubbleDistance = topWall;
-    if (topWall <= 0) {
-        return true;
-    }
+//     var rightWall = bubble.me().offset().left + bubble_width - $("#right_wall").offset().left
+//     // console.log(rightWall)
+//     if (rightWall >= 0) {
+//         return true;
+//     }
+// }
+// function _bubbleCollisionTopWall() {
 
 
-}
-function vector(reverse = false) {
+//     var topWall = bubble.me().offset().top - $("#top_wall").offset().top;
+//     bubbleDistance = topWall;
+//     if (topWall <= 0) {
+//         return true;
+//     }
 
 
-    x = $("#pointer").offset().left - $("#target").offset().left;
-    y = $("#pointer").offset().top - $("#target").offset().top;
+// }
+// function vector(reverse = false) {
 
-    var angle = Math.atan2(y, x);
 
-    var velX = Math.cos(angle) * velocity;
-    var velY = Math.sin(angle) * velocity;
+//     x = $("#pointer").offset().left - $("#target").offset().left;
+//     y = $("#pointer").offset().top - $("#target").offset().top;
 
-    return { x: velX, y: velY }
+//     var angle = Math.atan2(y, x);
 
-}
-function stopBubble() {
-    bubble_type = randomInt(1, 2);
-    flag = false;
-    bubblePlay();
+//     var velX = Math.cos(angle) * velocity;
+//     var velY = Math.sin(angle) * velocity;
+
+//     return { x: velX, y: velY }
+
+// }
+// function stopBubble() {
+//     bubble_type = randomInt(1, 2);
+//     flag = false;
+//     bubblePlay();
  
-        randColor2 = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
-        var space_cords = closer_space();
-        matrix[space_cords.y][space_cords.x] = bubble;
+//         randColor2 = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
+//         var space_cords = closer_space();
+//         matrix[space_cords.y][space_cords.x] = bubble;
     
     
-        prom.push(bubbleBreak_async(space_cords.x, space_cords.y));
+//         prom.push(bubbleBreak_async(space_cords.x, space_cords.y));
     
     
-        Promise.all(prom).then((res) => {
+//         Promise.all(prom).then((res) => {
     
-            if (chain < 3) {
-                bubbleBreak(space_cords.x, space_cords.y).then(function(){
-                    shoting = false;
-                    // $("#raycast").removeClass("hide"); 
-                });
-            } else {
-                toBreak.push({ x: space_cords.x, y: space_cords.y });
-                getBubbles(toBreak);
-            }    
-            chain = 0;
-            toBreak = [];
-            prom = [];
-            chainX = [];
-            chainY = [];
+//             if (chain < 3) {
+//                 bubbleBreak(space_cords.x, space_cords.y).then(function(){
+//                     shoting = false;
+//                     // $("#raycast").removeClass("hide"); 
+//                 });
+//             } else {
+//                 toBreak.push({ x: space_cords.x, y: space_cords.y });
+//                 getBubbles(toBreak);
+//             }    
+//             chain = 0;
+//             toBreak = [];
+//             prom = [];
+//             chainX = [];
+//             chainY = [];
             
     
-        });
+//         });
 
-        bubble.adjust(space_cords.left, space_cords.top).then(() => {
-            bubble.setState(0);
-            bt = 0;
-            bl = 0;
-            inclinacion = false;
-            bubble = undefined;
-            rotates(0)
+//         bubble.adjust(space_cords.left, space_cords.top).then(() => {
+//             bubble.setState(0);
+//             bt = 0;
+//             bl = 0;
+//             inclinacion = false;
+//             bubble = undefined;
+//             rotates(0)
             
-        });
+//         });
 
-        var bubble_ready = new Promise((resolve)=>{
-            $("#target").append('<div id="bubble_ready" class="bubble infinite_anim" style="width:' + bubble_width + 'px; height:' + bubble_width + 'px" data-type="' + bubble_type + '"></div>');
-            resolve();
-        }) 
-        bubble_ready.then(()=>{
-            TweenMax.fromTo($("#bubble_ready"), 0.3, {scale:0},{scale:1,ease: Power1.easeIn})
-        })
+//         var bubble_ready = new Promise((resolve)=>{
+//             $("#target").append('<div id="bubble_ready" class="bubble infinite_anim" style="width:' + bubble_width + 'px; height:' + bubble_width + 'px" data-type="' + bubble_type + '"></div>');
+//             resolve();
+//         }) 
+//         bubble_ready.then(()=>{
+//             TweenMax.fromTo($("#bubble_ready"), 0.3, {scale:0},{scale:1,ease: Power1.easeIn})
+//         })
 
     
 
-}
+// }
 
 // function loop(timestamp) {
 
@@ -290,204 +291,201 @@ function stopBubble() {
 // }
 // window.requestAnimationFrame(loop);
 
-function bubbleBreak(x, y) {
+// function bubbleBreak(x, y) {
 
-    return new Promise((resolve, reject) => {
-        var randColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
-        // var randColor = 'rgba(255,255,255,0.3);';
+//     return new Promise((resolve, reject) => {
+//         var randColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+//         // var randColor = 'rgba(255,255,255,0.3);';
 
-        var mx;
-        var my;
+//         var mx;
+//         var my;
 
-        if (y % 2 == 0) {
-            my = -1
-            mx = -1
-            for (let i = 1; i <= 6; i++) {
-                if (i == 6) {
-                    mx = -1;
-                }
-                if (mx == 2) {
-                    mx = -1;
-                }
+//         if (y % 2 == 0) {
+//             my = -1
+//             mx = -1
+//             for (let i = 1; i <= 6; i++) {
+//                 if (i == 6) {
+//                     mx = -1;
+//                 }
+//                 if (mx == 2) {
+//                     mx = -1;
+//                 }
 
 
-                //$(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor });
-                collideAnimation((parseInt(x) + mx), (parseInt(y) + my));
-                if (Number.isInteger(i / 2)) {
-                    my = my + 1;
-                }
-                mx = mx + 1;
-            }
-        } else {
-            my = -1;
-            mx = 0;
-            for (let i = 1; i <= 6; i++) {
-                if (i == 1 || i == 6) {
-                    mx = 0;
-                }
-                if (i == 3) {
-                    mx = -1;
-                }
-                if (i == 2 || i == 4 || i == 5) {
-                    mx = +1;
-                }
+//                 //$(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor });
+//                 collideAnimation((parseInt(x) + mx), (parseInt(y) + my));
+//                 if (Number.isInteger(i / 2)) {
+//                     my = my + 1;
+//                 }
+//                 mx = mx + 1;
+//             }
+//         } else {
+//             my = -1;
+//             mx = 0;
+//             for (let i = 1; i <= 6; i++) {
+//                 if (i == 1 || i == 6) {
+//                     mx = 0;
+//                 }
+//                 if (i == 3) {
+//                     mx = -1;
+//                 }
+//                 if (i == 2 || i == 4 || i == 5) {
+//                     mx = +1;
+//                 }
 
-                //$(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor });
-                collideAnimation((parseInt(x) + mx), (parseInt(y) + my));
-                if (Number.isInteger(i / 2)) {
-                    my = my + 1;
-                }
+//                 //$(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor });
+//                 collideAnimation((parseInt(x) + mx), (parseInt(y) + my));
+//                 if (Number.isInteger(i / 2)) {
+//                     my = my + 1;
+//                 }
 
-            }
-        }
-        setTimeout(function(){
-            resolve();
-        },150)
+//             }
+//         }
+//         setTimeout(function(){
+//             resolve();
+//         },150)
 
         
 
 
-    })
-}
-function bubbleBreak_async(x, y) {
-    chainX.push(parseInt(x));
-    chainY.push(parseInt(y));
-
-    return new Promise((resolve, reject) => {
-        var bubbleNext = [];
-
-
-        var mx;
-        var my;
+//     })
+// }
+// function bubbleBreak_async(x, y) {
+//     chainX.push(parseInt(x));
+//     chainY.push(parseInt(y));
+//     return new Promise((resolve, reject) => {
+//         var bubbleNext = [];
 
 
-        if (y % 2 == 0) {
-
-            my = -1
-            mx = -1
-            for (let i = 1; i <= 6; i++) {
-
-                if (i == 6) {
-                    mx = -1;
-                }
-                if (mx == 2) {
-                    mx = -1;
-                }
-
-                var type = matrixPath((parseInt(x) + mx), (parseInt(y) + my))
-                if (type === bubble.type) {
-
-                    // $(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor2 });
-
-                    if (!chainExists((parseInt(x) + mx), (parseInt(y) + my))) {
-                        chain++;
-                        toBreak.push({ x: parseInt(x) + mx, y: parseInt(y) + my })
-                        prom.push(bubbleBreak_async((parseInt(x) + mx), (parseInt(y) + my)))
+//         var mx;
+//         var my;
 
 
-                    }
-                }
+//         if (y % 2 == 0) {
 
-                chainX.push(parseInt(x) + mx);
-                chainY.push(parseInt(y) + my);
+//             my = -1
+//             mx = -1
+//             for (let i = 1; i <= 6; i++) {
 
+//                 if (i == 6) {
+//                     mx = -1;
+//                 }
+//                 if (mx == 2) {
+//                     mx = -1;
+//                 }
 
-                if (Number.isInteger(i / 2)) {
-                    my = my + 1;
-                }
-                mx = mx + 1;
-            }
-            resolve()
+//                 var type = matrixPath((parseInt(x) + mx), (parseInt(y) + my))
+//                 if (type === bubble.type) {
 
+//                     // $(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor2 });
 
-        } else {
-
-            my = -1;
-            mx = 0;
-            for (let i = 1; i <= 6; i++) {
-
-                if (i == 1 || i == 6) {
-                    mx = 0;
-                }
-                if (i == 3) {
-                    mx = -1;
-                }
-                if (i == 2 || i == 4 || i == 5) {
-                    mx = +1;
-                }
-
-                var type = matrixPath((parseInt(x) + mx), (parseInt(y) + my))
-                if (type === bubble.type) {
-                    // $(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor2 });
-
-                    if (!chainExists((parseInt(x) + mx), (parseInt(y) + my))) {
-                        chain++;
-                        toBreak.push({ x: parseInt(x) + mx, y: parseInt(y) + my })
-                        prom.push(bubbleBreak_async((parseInt(x) + mx), (parseInt(y) + my)))
+//                     if (!chainExists((parseInt(x) + mx), (parseInt(y) + my))) {
+//                         chain++;
+//                         toBreak.push({ x: parseInt(x) + mx, y: parseInt(y) + my })
+//                         prom.push(bubbleBreak_async((parseInt(x) + mx), (parseInt(y) + my)))
 
 
+//                     }
+//                 }
 
-                    }
-                }
+//                 chainX.push(parseInt(x) + mx);
+//                 chainY.push(parseInt(y) + my);
 
-                chainX.push(parseInt(x) + mx);
-                chainY.push(parseInt(y) + my);
+
+//                 if (Number.isInteger(i / 2)) {
+//                     my = my + 1;
+//                 }
+//                 mx = mx + 1;
+//             }
+//             resolve()
+
+
+//         } else {
+
+//             my = -1;
+//             mx = 0;
+//             for (let i = 1; i <= 6; i++) {
+
+//                 if (i == 1 || i == 6) {
+//                     mx = 0;
+//                 }
+//                 if (i == 3) {
+//                     mx = -1;
+//                 }
+//                 if (i == 2 || i == 4 || i == 5) {
+//                     mx = +1;
+//                 }
+
+//                 var type = matrixPath((parseInt(x) + mx), (parseInt(y) + my))
+//                 if (type === bubble.type) {
+//                     // $(".grid_bubble[data-column='" + (parseInt(x) + mx) + "'][data-row='" + (parseInt(y) + my) + "']").css({ 'background-color': randColor2 });
+
+//                     if (!chainExists((parseInt(x) + mx), (parseInt(y) + my))) {
+//                         chain++;
+//                         toBreak.push({ x: parseInt(x) + mx, y: parseInt(y) + my })
+//                         prom.push(bubbleBreak_async((parseInt(x) + mx), (parseInt(y) + my)))
 
 
 
-                if (Number.isInteger(i / 2)) {
-                    my = my + 1;
-                }
+//                     }
+//                 }
 
-            }
+//                 chainX.push(parseInt(x) + mx);
+//                 chainY.push(parseInt(y) + my);
 
-            resolve()
 
-        }
 
-        //resolve(matrix[y][x])
+//                 if (Number.isInteger(i / 2)) {
+//                     my = my + 1;
+//                 }
 
-    })
-}
-function chainExists(x, y) {
-    for (let i = 0; i < chainX.length; i++) {
-        if (chainX[i] === x && chainY[i] === y) {
-            return true;
-        }
+//             }
 
-    }
-    return false;
+//             resolve()
 
-}
-function matrixPath(x, y) {
-    if (x >= 0 && y >= 0 && x <= matrix.length - 1 && y <= matrix.length - 1) {
-        if (matrix[y][x] != undefined) {
-            //console.log(matrix[y][x].type)
-            return matrix[y][x].type;
-        }
-    }
-    return 0;
+//         }
 
-}
-function collideAnimation(x, y) {
-    if (x >= 0 && y >= 0 && x <= matrix.length - 1 && y <= matrix.length - 1) {
-        if (matrix[y][x] != undefined) {
-            matrix[y][x].collisionAnimate()
-            return true;
-        }
-    }
-}
+//     })
+// }
+// function chainExists(x, y) {
+//     for (let i = 0; i < chainX.length; i++) {
+//         if (chainX[i] === x && chainY[i] === y) {
+//             return true;
+//         }
 
-function set_raycast() {
-    $("#raycast").css({
-        "width": bubble_width + "px",
-        "left": "calc(50% - " + bubble_width / 2 + "px)"
-    })
-    $("#raycast #target, #pointer").css({
-        "width": bubble_width + "px",
-        "height": bubble_width + "px"
-    });
-}
+//     }
+//     return false;
+
+// }
+// function matrixPath(x, y) {
+//     if (x >= 0 && y >= 0 && x <= matrix.length - 1 && y <= matrix.length - 1) {
+//         if (matrix[y][x] != undefined) {
+//             //console.log(matrix[y][x].type)
+//             return matrix[y][x].type;
+//         }
+//     }
+//     return 0;
+
+// }
+// function collideAnimation(x, y) {
+//     if (x >= 0 && y >= 0 && x <= matrix.length - 1 && y <= matrix.length - 1) {
+//         if (matrix[y][x] != undefined) {
+//             matrix[y][x].collisionAnimate()
+//             return true;
+//         }
+//     }
+// }
+
+// function set_raycast() {
+//     $("#raycast").css({
+//         "width": bubble_width + "px",
+//         "left": "calc(50% - " + bubble_width / 2 + "px)"
+//     })
+//     $("#raycast #target, #pointer").css({
+//         "width": bubble_width + "px",
+//         "height": bubble_width + "px"
+//     });
+// }
 
 
 // function grid_manager() {
@@ -515,43 +513,40 @@ function set_raycast() {
 //     $("#target").append('<div id="bubble_ready" class="bubble infinite_anim" style="width:' + bubble_width + 'px; height:' + bubble_width + 'px" data-type="' + bubble_type + '"></div>');
 
 // }
-function clearSpace(x, y) {
-    $(".grid_bubble[data-column='" + x + "'][data-row='" + y + "']").attr("data-empty", "1").css({ 'background-color': 'rgba(255,255,255,0.3)' })
-}
-function getBubbles(bubbles) {
-    var i = 0;
-    var delay = 100;
+// function clearSpace(x, y) {
+//     $(".grid_bubble[data-column='" + x + "'][data-row='" + y + "']").attr("data-empty", "1").css({ 'background-color': 'rgba(255,255,255,0.3)' })
+// }
+// function getBubbles(bubbles) {
+//     var i = 0;
+//     var delay = 100;
 
-    bubbles.forEach((item) => {
+//     bubbles.forEach((item) => {
         
-        if (matrix[item.y][item.x] != undefined) {
-            setTimeout(() => {
+//         if (matrix[item.y][item.x] != undefined) {
+//             setTimeout(() => {
 
-                matrix[item.y][item.x].bubbleGet(item.x, item.y);
-                clearSpace(item.x, item.y);
+//                 matrix[item.y][item.x].bubbleGet(item.x, item.y);
+//                 clearSpace(item.x, item.y);
             
-            }, i * delay);
-            i++;
-        }
+//             }, i * delay);
+//             i++;
+//         }
         
-    });
-    bubblePlayOut();
-    setTimeout(function(){
-        shoting = false;
-        // $("#raycast").removeClass("hide"); 
-    },i*delay)
+//     });
+//     bubblePlayOut();
+//     setTimeout(function(){
+//         shoting = false;
 
-}
+//     },i*delay)
+
+// }
 
 // init()
 
 function run() {
-    for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-            shoot();
-        }, i * 1500)
-
-    }
+    $(".scene_instructions").addClass("d-flex").removeClass("d-none");
+    TweenMax.fromTo("#instructionsbox", 0.2,{scaleX:0,scaleY:0},{scaleX:0.7,scaleY:1.2,  ease: Power0.easeNone});
+    TweenMax.fromTo("#instructionsbox", 1.3, {scaleX:0.7, scaleY:1.2},{scaleX:1,scaleY:1, delay:0.2,  ease: Elastic.easeOut.config(1, 0.3)});
 }
 
 

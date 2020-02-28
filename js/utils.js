@@ -9,8 +9,8 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 function calc($bubble, $bubble2) {
-    var circle1 = { radius: bubble_radius - 2, x: $bubble.offset().left, y: $bubble.offset().top };
-    var circle2 = { radius: bubble_radius - 2, x: $bubble2.offset().left, y: $bubble2.offset().top };
+    var circle1 = { radius: gameManager.game.gridManager.bubble_radius - 2, x: $bubble.offset().left, y: $bubble.offset().top };
+    var circle2 = { radius: gameManager.game.gridManager.bubble_radius - 2, x: $bubble2.offset().left, y: $bubble2.offset().top };
     var dx = circle1.x - circle2.x;
     var dy = circle1.y - circle2.y;
     var distance = Math.sqrt(dx * dx + dy * dy);
